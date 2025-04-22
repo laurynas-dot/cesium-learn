@@ -2,18 +2,22 @@
 // where your node app starts
 
 // init project
+require("dotenv").config();
 const express = require('express');
+const path = require("path");
 const app = express();
 
-// http://expressjs.com/en/starter/static-files.html
 app.use(express.static('.'));
 
-// http://expressjs.com/en/starter/basic-routing.html
-app.get('/', function(request, response) {
-  response.sendFile(__dirname + '/index.html');
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "public/index.html"));
 });
 
-// listen for requests :)
+app.get("/cesium-token.js", (req, res) => {
+  res.setHeader("Content-Type", "application/javascript");
+  res.send(`window.CESIUM_TOKEN = "${process.env.CESIUM_TOKEN}";`);
+});
+
 const listener = app.listen(process.env.PORT, function() {
   console.log('Your app is listening on port ' + listener.address().port);
 });
