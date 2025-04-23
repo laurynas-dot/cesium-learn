@@ -12,12 +12,42 @@ viewer.camera.flyTo({
 
 const entities = viewer.entities;
 
-// This represents air defence over Vilnius
-const defenceRadius = 20000;
-entities.add({
-  position: vilniusCoordinates,
-  ellipsoid: {
-    radii: new Cesium.Cartesian3(defenceRadius, defenceRadius, defenceRadius),
-    material: new Cesium.Color(0, 1, 0, 0.15),
+// Air Defence
+const pickColor = (type, alpha) => {
+  switch (type) {
+    case "friendly":
+      return new Cesium.Color(0, 1, 0, alpha);
+    case "enemy":
+      return new Cesium.Color(1, 0, 0, alpha);
+    default:
+      return new Cesium.Color(1, 1, 1, alpha);
   }
-});
+};
+
+const addAirDefence = (type, longitude, latitude, radius) => {
+  const color = pickColor(type, 0.15);
+  const position = Cesium.Cartesian3.fromDegrees(longitude, latitude, 0);
+  entities.add({
+    position,
+    ellipsoid: {
+      radii: new Cesium.Cartesian3(radius, radius, radius),
+      material: color,
+    }
+  });
+};
+
+addAirDefence("friendly", 25.2798, 54.68916, 30000);
+
+// Actions
+
+viewer.screenSpaceEventHandler.setInputAction((click) => {
+  const pickedPosition = viewer.scene.pickPosition(click.position);
+  
+  if (Cesium.defined(pickedPosition)) {
+    const cartographic = Cesium.Cartographic.fromCartesian(pickedPosition);
+    const lon = Cesium.Math.toDegrees(cartographic.longitude);
+    const lat = Cesium.Math.toDegrees(cartographic.latitude);
+
+    addAirDefence("enemy", lon, lat, 20000);
+  }
+}, Cesium.ScreenSpaceEventType.LEFT_CLICK);
