@@ -7,7 +7,23 @@
 </head>
 <body>
   <div id="cesiumContainer"></div>
-  <button id="toggle-building">Toggle new building</button>
+  <div id="actionBar">
+    <label>Action:
+      <select id="actionPicker">
+        <option value="addAirDefence">Add Air Defence</option>
+        <option value="deleteEntity">Delete</option>
+      </select>
+    </label>
+    <div id="addAirDefenceControl">
+      <label>Type:
+        <select id="typePicker">
+          <option value="friendly">Friendly</option>
+          <option value="enemy">Enemy</option>
+        </select>
+      </label>
+      <input type="number" id="radiusInput" placeholder="Radius (meters)" value="20000">
+    </div>
+  </div>
   <script src="cesium-token.js"></script>
   <script src="public/main.js"></script>
 </body>
