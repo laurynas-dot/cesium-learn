@@ -12,19 +12,28 @@
       <select id="actionPicker">
         <option value="addAirDefence">Add Air Defence</option>
         <option value="deleteEntity">Delete</option>
+        <option value="addDrone">Add Drone</option>
       </select>
     </label>
     <div id="addAirDefenceControl">
       <label>Type:
-        <select id="typePicker">
+        <select id="airDefenceTypePicker">
           <option value="friendly">Friendly</option>
           <option value="enemy">Enemy</option>
         </select>
       </label>
       <input type="number" id="radiusInput" placeholder="Radius (meters)" value="20000">
     </div>
+    <div id="addDroneControl">
+      <label>Type:
+        <select id="droneTypePicker">
+          <option value="friendly">Friendly</option>
+          <option value="enemy">Enemy</option>
+        </select>
+      </label>
+    </div>
   </div>
   <script src="cesium-token.js"></script>
-  <script src="public/main.js"></script>
+  <script type="module" src="public/main.js"></script>
 </body>
 </html>

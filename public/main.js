@@ -1,14 +1,16 @@
 Cesium.Ion.defaultAccessToken = window.CESIUM_TOKEN;
 
+import { pickColor } from "./actions/Colors.js";
+import { addDroneAction } from "./actions/Drone.js";
+
 /** @type {import("cesium").Viewer} */
 const viewer = new Cesium.Viewer('cesiumContainer', {
   terrain: Cesium.Terrain.fromWorldTerrain(),
 });
 
-const vilniusCoordinates = Cesium.Cartesian3.fromDegrees(25.2798, 53.68916, 100000);
-const startOrientation = 
+const startCoordinates = Cesium.Cartesian3.fromDegrees(25.2798, 53.68916, 100000);
 viewer.camera.setView({
-  destination: vilniusCoordinates,
+  destination: startCoordinates,
   orientation: {
     heading: Cesium.Math.toRadians(0),
     pitch: Cesium.Math.toRadians(-30),
@@ -19,28 +21,21 @@ viewer.camera.setView({
 const entities = viewer.entities;
 
 // Air Defence
-const pickColor = (type, alpha) => {
-  switch (type) {
-    case "friendly":
-      return new Cesium.Color(0, 1, 0, alpha);
-    case "enemy":
-      return new Cesium.Color(1, 0, 0, alpha);
-    default:
-      return new Cesium.Color(1, 1, 1, alpha);
-  }
-};
+
 
 const addAirDefence = (type, longitude, latitude, radius) => {
   const color = pickColor(type, 0.15);
   const position = Cesium.Cartesian3.fromDegrees(longitude, latitude, 0);
+  const id = Cesium.createGuid();
   entities.add({
+    id,
     position,
     ellipsoid: {
       radii: new Cesium.Cartesian3(radius, radius, radius),
       material: color,
     },
     properties: {
-      isAirDefence: true
+      remove: () => entities.remove(id),
     }
   });
 };
@@ -49,11 +44,12 @@ addAirDefence("friendly", 25.2798, 54.68916, 30000);
 
 // UI Selectors
 const actionPicker = document.getElementById("actionPicker");
-const typePicker = document.getElementById("typePicker");
+const typePicker = document.getElementById("airDefenceTypePicker");
 const radiusInput = document.getElementById("radiusInput");
 
 const actionControls = {
   addAirDefence: document.getElementById("addAirDefenceControl"),
+  addDrone: document.getElementById("addDroneControl"),
 };
 
 const updateUIVisibility = () => {
@@ -63,7 +59,7 @@ const updateUIVisibility = () => {
   }
 
   const selected = actionPicker.value;
-  control = actionControls[selected];
+  const control = actionControls[selected];
   if (control)
     control.style.display = "inline-block";
 }
@@ -95,7 +91,8 @@ const actions = {
     const pickedObject = viewer.scene.pick(click.position);
     if (Cesium.defined(pickedObject) && pickedObject.id?.properties?.isAirDefence)
       entities.remove(pickedObject.id);
-  }
+  },
+  addDrone: (click) => addDroneAction(click, viewer),
 }
 
 // Bindings
@@ -106,3 +103,5 @@ viewer.screenSpaceEventHandler.setInputAction((click) => {
     action(click);
 
 }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
+
+updateUIVisibility();
