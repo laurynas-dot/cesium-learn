@@ -6,9 +6,9 @@ const typePicker = document.getElementById("droneTypePicker");
  * 
  * @param {{lon: number, lat: number}} start 
  * @param {{lon: number, lat: number}} end 
- * @param {import("cesium").Viewer} viewer - The Cesium viewer instance.
+ * @param {import("cesium").EntityCollection} viewer - The Cesium viewer instance.
  */
-const addDrone = (start, end, viewer) => {
+const addDrone = (start, end, entities) => {
   const groupId = Cesium.createGuid();
   const fullColor = pickColor(typePicker.value);
   const transparentColor = pickColor(typePicker.value, 0.5);
@@ -20,13 +20,15 @@ const addDrone = (start, end, viewer) => {
   const endId = groupId + "-end";
   const droneId = groupId + "-drone";
   const remove = () => {
-    const entities = viewer.entities;
-    entities.remove(startId);
-    entities.remove(endId);
-    entities.remove(droneId);
+    const start = entities.getById(startId);
+    const end = entities.getById(endId);
+    const drone = entities.getById(droneId);
+
+    entities.remove(start);
+    entities.remove(end);
+    entities.remove(drone);
   };
 
-  const entities = viewer.entities;
   entities.add({
     id: startId,
     position: startPosition,
@@ -95,6 +97,6 @@ export const addDroneAction = (click, viewer) => {
     return;
   }
 
-  addDrone(droneStart, { lon, lat }, viewer);
+  addDrone(droneStart, { lon, lat }, viewer.entities);
   droneStart = undefined;
 };

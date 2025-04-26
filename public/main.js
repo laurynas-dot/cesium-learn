@@ -35,7 +35,7 @@ const addAirDefence = (type, longitude, latitude, radius) => {
       material: color,
     },
     properties: {
-      remove: () => entities.remove(id),
+      remove: () => entities.remove(entities.getById(id)),
     }
   });
 };
@@ -89,8 +89,12 @@ const actions = {
   deleteEntity: (click) => {
     console.log("Delete");
     const pickedObject = viewer.scene.pick(click.position);
-    if (Cesium.defined(pickedObject) && pickedObject.id?.properties?.isAirDefence)
-      entities.remove(pickedObject.id);
+    if (!Cesium.defined(pickedObject))
+      return;
+    
+    const removeAction = pickedObject.id?.properties?.remove;
+    if (removeAction)
+      removeAction.getValue()();
   },
   addDrone: (click) => addDroneAction(click, viewer),
 }
