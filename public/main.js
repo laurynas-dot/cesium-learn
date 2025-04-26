@@ -5,9 +5,15 @@ const viewer = new Cesium.Viewer('cesiumContainer', {
   terrain: Cesium.Terrain.fromWorldTerrain(),
 });
 
-const vilniusCoordinates = Cesium.Cartesian3.fromDegrees(25.2798, 54.68916, 0);
-viewer.camera.flyTo({
+const vilniusCoordinates = Cesium.Cartesian3.fromDegrees(25.2798, 53.68916, 100000);
+const startOrientation = 
+viewer.camera.setView({
   destination: vilniusCoordinates,
+  orientation: {
+    heading: Cesium.Math.toRadians(0),
+    pitch: Cesium.Math.toRadians(-30),
+    roll: 0
+  }
 });
 
 const entities = viewer.entities;
