@@ -6,7 +6,16 @@ import { addDroneAction } from "./actions/Drone.js";
 /** @type {import("cesium").Viewer} */
 const viewer = new Cesium.Viewer('cesiumContainer', {
   terrain: Cesium.Terrain.fromWorldTerrain(),
+  timeline: true,
+  animation: true,
 });
+
+const clock = viewer.clock;
+clock.startTime = Cesium.JulianDate.fromIso8601("2025-04-26T00:00:00Z");
+clock.stopTime = Cesium.JulianDate.fromIso8601("2025-04-26T00:05:00Z");
+clock.currentTime = clock.startTime;
+clock.clockRange = Cesium.ClockRange.LOOP_STOP;
+clock.clockStep = Cesium.ClockStep.SYSTEM_CLOCK;
 
 const startCoordinates = Cesium.Cartesian3.fromDegrees(25.2798, 53.68916, 100000);
 viewer.camera.setView({

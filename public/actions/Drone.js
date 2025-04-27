@@ -6,9 +6,10 @@ const typePicker = document.getElementById("droneTypePicker");
  * 
  * @param {{lon: number, lat: number}} start 
  * @param {{lon: number, lat: number}} end 
- * @param {import("cesium").EntityCollection} viewer - The Cesium viewer instance.
+ * @param {import("cesium").Viewer} viewer - The Cesium viewer instance.
  */
-const addDrone = (start, end, entities) => {
+const addDrone = (start, end, viewer) => {
+  const entities = viewer.entities;
   const groupId = Cesium.createGuid();
   const fullColor = pickColor(typePicker.value);
   const transparentColor = pickColor(typePicker.value, 0.5);
@@ -63,17 +64,42 @@ const addDrone = (start, end, entities) => {
     }
   });
 
-   entities.add({
-     id: droneId,
-     position: droneStartPosition,
-     ellipsoid: {
-       radii: new Cesium.Cartesian3(1000, 1000, 1000),
-       material: fullColor,
-     },
-     properties: {
-       remove,
-     }
-   });
+  const czml = [
+    {
+      id: "document",
+      name: "Drone Flight",
+      version: "1.0",
+    },
+    {
+      id: droneId,
+      availability: "2025-04-26T00:00:00Z/2025-04-26T00:05:00Z",
+      position: {
+        epoch: "2025-04-26T00:00:00Z",
+        cartographicDegrees: [
+          0, start.lon, start.lat, 10000,
+          300, end.lon, end.lat, 10000,
+        ],
+      },
+      point: {
+        pixelSize: 15,
+        color: {
+          rgba: [fullColor.red * 255, fullColor.green * 255, fullColor.blue * 255, 255],
+        },
+        outlineColor: {
+          rgba: [fullColor.red * 255, fullColor.green * 255, fullColor.blue * 255, 255],
+        },
+        outlineWidth: 2,
+      },
+    },
+  ];
+
+  const czmlDataSource = new Cesium.CzmlDataSource();
+  czmlDataSource.load(czml).then(() => {
+    viewer.dataSources.add(czmlDataSource);
+    console.log("CZML Data Loaded Successfully");
+  }).catch((error) => {
+    console.error("Error loading CZML data:", error);
+  });
 };
 
 let droneStart = undefined;
@@ -97,6 +123,6 @@ export const addDroneAction = (click, viewer) => {
     return;
   }
 
-  addDrone(droneStart, { lon, lat }, viewer.entities);
+  addDrone(droneStart, { lon, lat }, viewer);
   droneStart = undefined;
 };
